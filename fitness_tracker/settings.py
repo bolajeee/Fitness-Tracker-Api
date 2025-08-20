@@ -40,8 +40,23 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # created app
-    'tracker'
+    'tracker',
+    
+    # dependency
+    'rest_framework',
+    'rest_framework.authtoken'
 ]
+
+# JWT token configuration
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
+
+# Custom user model configuration
+AUTH_USER_MODEL = 'tracker.CustomUser'
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
