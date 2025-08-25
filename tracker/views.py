@@ -42,27 +42,38 @@ class UserViewSet(viewsets.ModelViewSet):
         self.check_object_permissions(self.request, obj)
         return obj
 
-    @action(detail=True, methods=["get"], url_path="activity")
-    def history(self, request, pk=None):
-        # Admin can view anyone; normal users only themselves
+    @action(detail=True, methods=['delete'])
+    def delete_user(self, request, pk=None):
         user = get_object_or_404(CustomUser, pk=pk)
-        if not (request.user.is_staff or request.user.pk == user.pk):
-            return Response({"detail": "Forbidden"}, status=403)
 
-        qs = Activity.objects.filter(user=user)
+        # only allow a user to delete themselves OR admin
+        if request.user != user and not request.user.is_staff:
+            return Response({"error": "You can only delete your own account."}, status=403)
 
-        # Optional sorting via ?order=-created_at
-        order = request.query_params.get("order", "-created_at")
-        allowed = {"created_at", "-created_at", "date", "-date", "duration_minutes",
-                   "-duration_minutes", "calories_burned", "-calories_burned"}
-        if order not in allowed:
-            order = "-created_at"
+        user.delete()
+        return Response({"message": "User deleted successfully."}, status=204)
 
-        activities = qs.order_by(order)
-        page = self.paginate_queryset(activities)
-        ser = ActivitySerializer(page or activities, many=True)
-        return self.get_paginated_response(ser.data) if page is not None else Response(ser.data)
+    @action(detail=True, methods=['get'], url_path='history')
+    def history(self, request, pk=None):
+        user = get_object_or_404(CustomUser, pk=pk)
 
+        activities = Activity.objects.filter(user=user)
+
+        # query params: ?start_date=2025-01-01&end_date=2025-01-31
+        start_date = request.query_params.get('start_date')
+        end_date = request.query_params.get('end_date')
+        activity_type = request.query_params.get('type')
+
+        if start_date:
+            activities = activities.filter(date__gte=start_date)
+        if end_date:
+            activities = activities.filter(date__lte=end_date)
+        if activity_type:
+            activities = activities.filter(type=activity_type)
+
+        activities = activities.order_by('-created_at')
+        serializer = ActivitySerializer(activities, many=True)
+        return Response(serializer.data)
 class ActivityViewSet(viewsets.ModelViewSet):
     serializer_class = ActivitySerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -75,15 +86,17 @@ class ActivityViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-    @action(detail=False, methods=["get"])
-    def summary(self, request):
-        qs = self.get_queryset()
-        agg = qs.aggregate(
-            total_duration=Sum("duration_minutes"),
-            total_calories=Sum("calories_burned"),
-            total_distance=Sum("distance_km"),
-        )
-        # Replace None with 0
-        for k in agg:
-            agg[k] = agg[k] or 0
-        return Response(agg)
+    @action(detail=False, methods=['get'])
+    def metrics(self, request):
+        activities = self.get_queryset()
+        total_duration = activities.aggregate(Sum('duration_minutes'))['duration_minutes__sum'] or 0
+        total_calories = activities.aggregate(Sum('calories_burned'))['calories_burned__sum'] or 0
+        count = activities.count()
+
+        return Response({
+            "count": count,
+            "total_duration": total_duration,
+            "total_calories": total_calories,
+            "avg_duration": total_duration / count if count > 0 else 0,
+            "avg_calories": total_calories / count if count > 0 else 0,
+        })

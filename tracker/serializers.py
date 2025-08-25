@@ -30,9 +30,11 @@ class UserSerializer(serializers.ModelSerializer):
 class ActivitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
-        fields = ["id", "type", "date", "duration_minutes", "calories_burned", "distance_km", "created_at"]
-        read_only_fields = ["created_at"]
+        fields = "__all__"
 
-    def create(self, validated_data):
-        # user is injected in the view
-        return Activity.objects.create(**validated_data)
+    def validate(self, data):
+        if data.get("duration_minutes", 0) <= 0:
+            raise serializers.ValidationError("Duration must be greater than 0.")
+        if data.get("calories_burned", 0) < 0:
+            raise serializers.ValidationError("Calories burned cannot be negative.")
+        return data
