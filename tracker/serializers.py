@@ -2,39 +2,24 @@ from rest_framework import serializers
 from .models import CustomUser, Activity
 
 class UserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=True)
-
     class Meta:
         model = CustomUser
-        fields = ['id', 'password', 'email', 'age', 'height', 'weight']
+        fields = ["id", "email", "age", "height", "weight", "is_active", "is_staff", "password"]
+        extra_kwargs = {"password": {"write_only": True}}
 
     def create(self, validated_data):
-        user = CustomUser(
-            username=validated_data["username"],
-            email=validated_data.get("email", "")
+        user = CustomUser.objects.create_user(
+            email=validated_data["email"],
+            password=validated_data["password"],
+            age=validated_data.get("age"),
+            height=validated_data.get("height"),
+            weight=validated_data.get("weight"),
         )
-        user.set_password(validated_data["password"])  # ✅ hash password
-        user.save()
         return user
-
-    def update_password(self, instance, validated_data):
-        password = validated_data.pop("password", None)
-        for k, v in validated_data.items():
-            setattr(instance, k, v)
-        if password:
-            instance.set_password(password)
-        instance.save()
-        return instance
 
 
 class ActivitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
         fields = "__all__"
-
-    def validate(self, data):
-        if data.get("duration_minutes", 0) <= 0:
-            raise serializers.ValidationError("Duration must be greater than 0.")
-        if data.get("calories_burned", 0) < 0:
-            raise serializers.ValidationError("Calories burned cannot be negative.")
-        return data
+        read_only_fields = ["user", "created_at", "updated_at"]

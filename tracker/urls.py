@@ -9,7 +9,7 @@ router.register(r"users", UserViewSet, basename="user")
 router.register(r"activities", ActivityViewSet, basename="activity")
 
 urlpatterns = [
-    path("", include(router.urls)),
+    path("api/", include(router.urls)),
 
     # JWT
     path("api/auth/login/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
