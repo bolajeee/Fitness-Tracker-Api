@@ -53,8 +53,8 @@ class UserViewSet(viewsets.ModelViewSet):
         user.delete()
         return Response({"message": "User deleted successfully."}, status=204)
 
-    @action(detail=True, methods=['get'], url_path='history')
-    def history(self, request, pk=None):
+    @action(detail=True, methods=['get'], url_path='activities')
+    def activities(self, request, pk=None):
         user = get_object_or_404(CustomUser, pk=pk)
 
         activities = Activity.objects.filter(user=user)
