@@ -25,10 +25,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
     # Limit non-admins to themselves
     def get_queryset(self):
-        
-        if self.request.user.is_staff:
-            return super().get_queryset()
-        return CustomUser.objects.filter(pk=self.request.user.pk)
+        return self.queryset
 
     # Allow anyone to create an account
     def get_permissions(self):
