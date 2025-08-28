@@ -74,6 +74,7 @@ class UserViewSet(viewsets.ModelViewSet):
         activities = activities.order_by('-created_at')
         serializer = ActivitySerializer(activities, many=True)
         return Response(serializer.data)
+
 class ActivityViewSet(viewsets.ModelViewSet):
     serializer_class = ActivitySerializer
     permission_classes = [permissions.IsAuthenticated]

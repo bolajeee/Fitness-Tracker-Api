@@ -97,9 +97,13 @@ WSGI_APPLICATION = 'fitness_tracker.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+   'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'fitnesstrackerdb',         # database name
+        'USER': 'myuser',       # username
+        'PASSWORD': 'Ib12345678*',
+        'HOST': 'localhost',    # or an IP/domain if using a remote DB
+        'PORT': '5432',         # default PostgreSQL port
     }
 }
 
