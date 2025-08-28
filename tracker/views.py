@@ -84,7 +84,7 @@ class ActivityViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['get'], url_path='metrics')
     def metrics(self, request):
         activities = self.get_queryset()
         total_duration = activities.aggregate(Sum('duration_minutes'))['duration_minutes__sum'] or 0

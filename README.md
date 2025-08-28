@@ -46,9 +46,6 @@ Endpoints
 
 * `GET /api/users/{id}/history/`: Get activity history for a user.
 
-### Activity Metrics Endpoints
-
-* `GET /api/users/{id}/metrics/`: Get activity metrics for a user.
 
 Installation
 ------------
