@@ -1,8 +1,3 @@
-# Fitness-Tracker-Api
-
-
-
-Here is a full README for the project:
 
 
 Fitness Tracker API
@@ -22,6 +17,7 @@ Features
 * **Activity Metrics**: Calculate and return activity metrics for a user.
 * **Optional Filters**: Filter activity history by date range or activity type.
 * **Validation**: Validate required fields for activities and users.
+* **Authorization**: The API uses JSON Web Tokens (JWT) for authentication and authorization.
 
 Endpoints
 --------
@@ -46,7 +42,35 @@ Endpoints
 
 * `GET /api/users/{id}/history/`: Get activity history for a user.
 
+### Authorization Endpoints
 
+* `POST /api/auth/login/`: Obtain a JWT token for a user.
+* `POST /api/auth/refresh/`: Refresh a JWT token.
+
+Authorization
+------------
+
+The API uses JSON Web Tokens (JWT) for authentication and authorization. To use the API, you need to obtain a JWT token by sending a `POST` request to the `/api/auth/login/` endpoint with your username and password. The token is then used in the `Authorization` header of subsequent requests.
+
+Example:
+```bash
+curl -X POST \
+  http://localhost:8000/api/auth/login/ \
+  -H 'Content-Type: application/json' \
+  -d '{"username": "your_username", "password": "your_password"}'
+```
+This will return a JWT token that can be used in subsequent requests:
+```json
+{
+  "access": "your_jwt_token"
+}
+```
+To use the token, include it in the `Authorization` header of your requests:
+```bash
+curl -X GET \
+  http://localhost:8000/api/activities/ \
+  -H 'Authorization: Bearer your_jwt_token'
+```
 Installation
 ------------
 
