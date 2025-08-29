@@ -6,9 +6,11 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.db.models import Sum
 from django.views import View
-from django.contrib.auth import login
-from .models import CustomUser, Activity
-from .serializers import UserSerializer, ActivitySerializer
+from .models import CustomUser
+from .serializers import UserSerializer
+from rest_framework.authtoken.views import ObtainAuthToken
+from activities.models import Activity
+from activities.serializers import ActivitySerializer
 
 
 def home_view(request):
@@ -18,6 +20,7 @@ class IsSelfOrAdmin(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         return request.user.is_staff or obj == request.user
 
+
 class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [permissions.AllowAny]
@@ -25,7 +28,12 @@ class UserViewSet(viewsets.ModelViewSet):
 
     # Limit non-admins to themselves
     def get_queryset(self):
-        return self.queryset
+        # return self.queryset # all users 
+        # if admin, return all users
+        user = self.request.user
+        if user.is_staff:
+            return CustomUser.objects.all()
+        return CustomUser.objects.filter(id=user.id)
 
     # Allow anyone to create an account
     def get_permissions(self):
@@ -72,29 +80,3 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = ActivitySerializer(activities, many=True)
         return Response(serializer.data)
 
-class ActivityViewSet(viewsets.ModelViewSet):
-    serializer_class = ActivitySerializer
-    permission_classes = [permissions.IsAuthenticated]
-    filter_backends = [filters.OrderingFilter]
-    ordering_fields = ["date", "duration_minutes", "calories_burned", "distance_km", "created_at"]
-
-    def get_queryset(self):
-        return Activity.objects.filter(user=self.request.user)
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-    @action(detail=False, methods=['get'], url_path='metrics')
-    def metrics(self, request):
-        activities = self.get_queryset()
-        total_duration = activities.aggregate(Sum('duration_minutes'))['duration_minutes__sum'] or 0
-        total_calories = activities.aggregate(Sum('calories_burned'))['calories_burned__sum'] or 0
-        count = activities.count()
-
-        return Response({
-            "count": count,
-            "total_duration": total_duration,
-            "total_calories": total_calories,
-            "avg_duration": total_duration / count if count > 0 else 0,
-            "avg_calories": total_calories / count if count > 0 else 0,
-        })

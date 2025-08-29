@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CustomUser, Activity
+from .models import CustomUser
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -17,9 +17,3 @@ class UserSerializer(serializers.ModelSerializer):
         )
         return user
 
-
-class ActivitySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Activity
-        fields = "__all__"
-        read_only_fields = ["user", "created_at", "updated_at"]

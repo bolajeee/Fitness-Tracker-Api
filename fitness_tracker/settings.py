@@ -41,6 +41,7 @@ INSTALLED_APPS = [
 
     # created app
     'tracker',
+    'activities',
     
     # dependency
     'rest_framework',
