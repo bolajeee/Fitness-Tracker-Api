@@ -85,10 +85,6 @@ To install the project, follow these steps:
 3. Run the migrations: `python manage.py migrate`
 4. Run the server: `python manage.py runserver`
 
-API Documentation
------------------
-
-The API documentation can be found at `http://localhost:8000/api/docs/`.
 
 Contributing
 ------------

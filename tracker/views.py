@@ -47,8 +47,6 @@ class UserViewSet(viewsets.ModelViewSet):
         self.check_object_permissions(self.request, obj)
         return obj
 
-    @action(detail=True, methods=['delete'])
-    def delete_user(self, request, pk=None):
         user = get_object_or_404(CustomUser, pk=pk)
 
         # only allow a user to delete themselves OR admin
