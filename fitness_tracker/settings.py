@@ -10,8 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
-from pathlib import Path
 import os
+from pathlib import Path
+# hosting
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -72,6 +74,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    #hosting
+    "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
 
 ROOT_URLCONF = 'fitness_tracker.urls'
@@ -98,14 +102,9 @@ WSGI_APPLICATION = 'fitness_tracker.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-   'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'fitnesstrackerdb',         # database name
-        'USER': 'myuser',       # username
-        'PASSWORD': 'Ib12345678*',
-        'HOST': 'localhost',    # or an IP/domain if using a remote DB
-        'PORT': '5432',         # default PostgreSQL port
-    }
+   "default": dj_database_url.config(
+        default=os.getenv("DATABASE_URL")
+    )
 }
 
 
