@@ -75,6 +75,14 @@ curl -X GET \
   -H 'Authorization: Bearer your_jwt_token'
 ```
 
+API Documentation
+-----------------
+
+The API documentation is available in two formats: Swagger UI and ReDoc. Both provide an interactive way to explore the API endpoints.
+
+*   **Swagger UI**: [http://localhost:8000/swagger/](http://localhost:8000/swagger/)
+*   **ReDoc**: [http://localhost:8000/redoc/](http://localhost:8000/redoc/)
+
 Installation
 ------------
 

@@ -48,7 +48,8 @@ INSTALLED_APPS = [
     
     # dependency
     'rest_framework',
-    'rest_framework.authtoken'
+    'rest_framework.authtoken',
+    'drf_yasg',
 ]
 
 # JWT token configuration
@@ -103,8 +104,8 @@ WSGI_APPLICATION = 'fitness_tracker.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-   "default": dj_database_url.config(
-        default=os.getenv("DATABASE_URL")
+    'default': dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}"
     )
 }
 
